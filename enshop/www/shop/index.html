@@ -1,0 +1,67 @@
+<main>
+
+	<div class="feautured-text">
+		<h2>Browse <b>Shop</b></h2>
+	</div>
+
+	<div class="container">
+		{% for row in range(0,items|length,4) %}
+
+		<div class="row">
+			{% for col in range(row,items|length) %}
+			{% set card_limit = 0 + loop.index%}
+			{% if card_limit <= 4 %} <div class="col-md-3">
+
+
+				{%set name = items[col].name%}
+
+				{% set doc = frappe.get_all("Item Price", filters=[["price_list","=","Retail"],["item_code", "=", name]],
+				fields=['price_list_rate']) %}
+
+				<div id="make-3D-space">
+					<div class="product-card" id="product-card">
+						<div id="product-front">
+							<div class="shadow"></div>
+							<img src="{{ items[col].website_image or items[col].image or 'no-image.jpg' }}" alt="" />
+							<div class="image_overlay"></div>
+							<a href="{{items[col].route}}" id="view_details">View details</a>
+							<div class="stats">
+								<div class="stats-container">
+									<span class="product_price"> {{ frappe.utils.fmt_money( doc[0].price_list_rate if
+										doc|length != 0 else 0,
+										currency = 'USD', precision = 2) }}
+									</span>
+									<span style="margin-bottom: 20px;" class="product_name">{{items[col].item_name if
+										(items[col].item_name)|length < 17 else items[col].item_name|truncate()
+											}}</span>
+											<!-- <p>{{name}}</p> -->
+
+											<div class="product-options">
+												<div data-item-code="{{name}}" class="add_to_cart">ADD TO CART</div>
+											</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+		</div>
+		{% endif %}
+		{% endfor %}
+	</div>
+	{% endfor %}
+	</div>
+
+	<div class="row" style="text-align: center; ">
+		<div class="col-12">
+			{% if frappe.form_dict.start|int > 0 %}
+			<button class="my-btn btn btn-outline-secondary btn-prev"
+				data-start="{{ frappe.form_dict.start|int - page_length }}">{{ _("Prev") }}</button>
+			{% endif %}
+			{% if items|length >= page_length %}
+			<button class="my-btn btn btn-outline-secondary btn-next"
+				data-start="{{ frappe.form_dict.start|int + page_length }}">{{ _("Next") }}</button>
+			{% endif %}
+		</div>
+	</div>
+
+</main>
